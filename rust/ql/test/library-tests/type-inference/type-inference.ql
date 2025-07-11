@@ -6,7 +6,9 @@ import TypeInference
 query predicate inferType(AstNode n, TypePath path, Type t) {
   t = TypeInference::inferType(n, path) and
   n.fromSource() and
-  not n.isFromMacroExpansion()
+  not n.isFromMacroExpansion() and
+  not n instanceof IdentPat and // avoid overlap in the output with the underlying `Name` node
+  not n instanceof LiteralPat // avoid overlap in the output with the underlying `Literal` node
 }
 
 module ResolveTest implements TestSig {
@@ -28,8 +30,10 @@ module ResolveTest implements TestSig {
       source.fromSource() and
       not source.isFromMacroExpansion()
     |
-      target = resolveMethodCallTarget(source) and
+      target = source.(Call).getStaticTarget() and
       functionHasValue(target, value) and
+      // `isFromMacroExpansion` does not always work
+      not target.(Function).getName().getText() = ["panic_fmt", "_print", "format", "must_use"] and
       tag = "method"
       or
       target = resolveStructFieldExpr(source) and
@@ -55,10 +59,13 @@ module TypeTest implements TestSig {
     exists(AstNode n, TypePath path, Type t |
       t = TypeInference::inferType(n, path) and
       location = n.getLocation() and
-      element = n.toString() and
       if path.isEmpty()
       then value = element + ":" + t
       else value = element + ":" + path.toString() + "." + t.toString()
+    |
+      element = n.toString()
+      or
+      element = n.(IdentPat).getName().getText()
     )
   }
 }
