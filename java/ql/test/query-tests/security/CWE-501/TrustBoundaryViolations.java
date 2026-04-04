@@ -31,5 +31,11 @@ public class TrustBoundaryViolations extends HttpServlet {
             }
         } catch (Exception e) {
         }
+
+        // GOOD: Bean Validation @Pattern annotation constrains the input via regex.
+        String input4 = request.getParameter("input4");
+        if (input4.matches("[a-zA-Z0-9]+")) {
+            request.getSession().setAttribute("input4", input4);
+        }
     }
 }
