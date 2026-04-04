@@ -38,4 +38,12 @@ public class TrustBoundaryViolations extends HttpServlet {
             request.getSession().setAttribute("input4", input4);
         }
     }
+
+    @javax.validation.constraints.Pattern(regexp = "^[a-zA-Z0-9]+$")
+    String validatedField;
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+        // GOOD: The field is constrained by a @Pattern annotation.
+        request.getSession().setAttribute("validated", validatedField);
+    }
 }
