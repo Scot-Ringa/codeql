@@ -32,8 +32,8 @@ module VercelNode {
       this = any(Module m).getAnExportedValue("default").getAFunctionValue() and
       req = this.getParameter(0) and
       res = this.getParameter(1) and
-      req.hasUnderlyingType("@vercel/node", "VercelRequest") and
-      res.hasUnderlyingType("@vercel/node", "VercelResponse")
+      req.hasUnderlyingType(["@vercel/node", "@now/node"], ["NowRequest", "VercelRequest"]) and
+      res.hasUnderlyingType(["@vercel/node", "@now/node"], ["NowResponse", "VercelResponse"])
     }
 
     /** Gets the parameter that contains the request object. */
