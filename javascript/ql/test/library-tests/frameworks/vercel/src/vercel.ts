@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-// A private helper with the same signature. Must NOT be recognised as a
+// A private helper with the same signature. Must NOT be recognized as a
 // route handler, since Vercel only invokes the default export.
 function internalHelper(req: VercelRequest, res: VercelResponse) {
   res.send(req.query.name);

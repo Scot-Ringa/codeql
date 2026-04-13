@@ -9,9 +9,10 @@ import semmle.javascript.frameworks.HTTP
  * Provides classes for working with [@vercel/node](https://www.npmjs.com/package/@vercel/node) Vercel serverless functions.
  *
  * A Vercel serverless function is a module whose default export is a function
- * with signature `(req: VercelRequest, res: VercelResponse) => void`, where
- * the types are imported from the `@vercel/node` package. The Vercel runtime
- * invokes the default export for every incoming HTTP request.
+ * taking parameters `(req: VercelRequest, res: VercelResponse)`, where the
+ * types are imported from the `@vercel/node` package. The default export may
+ * be synchronous or `async`, and the Vercel runtime invokes it for every
+ * incoming HTTP request.
  */
 module VercelNode {
   /**
@@ -20,7 +21,7 @@ module VercelNode {
    * `VercelResponse` from `@vercel/node`.
    *
    * Since `@vercel/node` is commonly imported as a type-only import, handlers
-   * are recognised by their TypeScript parameter types. The default-export
+   * are recognized by their TypeScript parameter types. The default-export
    * constraint excludes private helpers or test utilities that share the
    * same signature.
    */
