@@ -2882,6 +2882,36 @@
 | Conditions.cs:149:44:149:46 | Before {...} | Conditions.cs:149:45:149:45 | access to local variable s |  |
 | Conditions.cs:149:44:149:46 | {...} | Conditions.cs:149:44:149:46 | After {...} |  |
 | Conditions.cs:149:45:149:45 | access to local variable s | Conditions.cs:149:44:149:46 | {...} |  |
+| DefaultParam.cs:1:7:1:18 | After call to constructor Object | DefaultParam.cs:1:7:1:18 | {...} |  |
+| DefaultParam.cs:1:7:1:18 | After call to method <object initializer> | DefaultParam.cs:1:7:1:18 | Before call to constructor Object |  |
+| DefaultParam.cs:1:7:1:18 | Before call to constructor Object | DefaultParam.cs:1:7:1:18 | call to constructor Object |  |
+| DefaultParam.cs:1:7:1:18 | Before call to method <object initializer> | DefaultParam.cs:1:7:1:18 | this access |  |
+| DefaultParam.cs:1:7:1:18 | Entry | DefaultParam.cs:1:7:1:18 | Before call to method <object initializer> |  |
+| DefaultParam.cs:1:7:1:18 | Normal Exit | DefaultParam.cs:1:7:1:18 | Exit |  |
+| DefaultParam.cs:1:7:1:18 | call to constructor Object | DefaultParam.cs:1:7:1:18 | After call to constructor Object |  |
+| DefaultParam.cs:1:7:1:18 | call to method <object initializer> | DefaultParam.cs:1:7:1:18 | After call to method <object initializer> |  |
+| DefaultParam.cs:1:7:1:18 | this access | DefaultParam.cs:1:7:1:18 | call to method <object initializer> |  |
+| DefaultParam.cs:1:7:1:18 | {...} | DefaultParam.cs:1:7:1:18 | Normal Exit |  |
+| DefaultParam.cs:3:12:3:13 | Entry | DefaultParam.cs:4:5:6:5 | {...} |  |
+| DefaultParam.cs:3:12:3:13 | Normal Exit | DefaultParam.cs:3:12:3:13 | Exit |  |
+| DefaultParam.cs:4:5:6:5 | {...} | DefaultParam.cs:5:9:5:25 | Before return ...; |  |
+| DefaultParam.cs:5:9:5:25 | Before return ...; | DefaultParam.cs:5:16:5:24 | Before ... + ... |  |
+| DefaultParam.cs:5:9:5:25 | return ...; | DefaultParam.cs:3:12:3:13 | Normal Exit | return |
+| DefaultParam.cs:5:16:5:16 | (...) ... | DefaultParam.cs:5:16:5:16 | After (...) ... |  |
+| DefaultParam.cs:5:16:5:16 | After (...) ... | DefaultParam.cs:5:20:5:20 | access to parameter s |  |
+| DefaultParam.cs:5:16:5:16 | Before (...) ... | DefaultParam.cs:5:16:5:16 | access to parameter b |  |
+| DefaultParam.cs:5:16:5:16 | access to parameter b | DefaultParam.cs:5:16:5:16 | (...) ... |  |
+| DefaultParam.cs:5:16:5:20 | ... + ... | DefaultParam.cs:5:16:5:20 | After ... + ... |  |
+| DefaultParam.cs:5:16:5:20 | After ... + ... | DefaultParam.cs:5:24:5:24 | Before (...) ... |  |
+| DefaultParam.cs:5:16:5:20 | Before ... + ... | DefaultParam.cs:5:16:5:16 | Before (...) ... |  |
+| DefaultParam.cs:5:16:5:24 | ... + ... | DefaultParam.cs:5:16:5:24 | After ... + ... |  |
+| DefaultParam.cs:5:16:5:24 | After ... + ... | DefaultParam.cs:5:9:5:25 | return ...; |  |
+| DefaultParam.cs:5:16:5:24 | Before ... + ... | DefaultParam.cs:5:16:5:20 | Before ... + ... |  |
+| DefaultParam.cs:5:20:5:20 | access to parameter s | DefaultParam.cs:5:16:5:20 | ... + ... |  |
+| DefaultParam.cs:5:24:5:24 | (...) ... | DefaultParam.cs:5:24:5:24 | After (...) ... |  |
+| DefaultParam.cs:5:24:5:24 | After (...) ... | DefaultParam.cs:5:16:5:24 | ... + ... |  |
+| DefaultParam.cs:5:24:5:24 | Before (...) ... | DefaultParam.cs:5:24:5:24 | access to parameter i |  |
+| DefaultParam.cs:5:24:5:24 | access to parameter i | DefaultParam.cs:5:24:5:24 | (...) ... |  |
 | ExitMethods.cs:6:7:6:17 | After call to constructor Object | ExitMethods.cs:6:7:6:17 | {...} |  |
 | ExitMethods.cs:6:7:6:17 | After call to method <object initializer> | ExitMethods.cs:6:7:6:17 | Before call to constructor Object |  |
 | ExitMethods.cs:6:7:6:17 | Before call to constructor Object | ExitMethods.cs:6:7:6:17 | call to constructor Object |  |

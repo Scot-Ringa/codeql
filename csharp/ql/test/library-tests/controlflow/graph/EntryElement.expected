@@ -1271,6 +1271,19 @@
 | Conditions.cs:149:40:149:43 | "b = " | Conditions.cs:149:40:149:43 | "b = " |
 | Conditions.cs:149:44:149:46 | {...} | Conditions.cs:149:45:149:45 | access to local variable s |
 | Conditions.cs:149:45:149:45 | access to local variable s | Conditions.cs:149:45:149:45 | access to local variable s |
+| DefaultParam.cs:1:7:1:18 | call to constructor Object | DefaultParam.cs:1:7:1:18 | call to constructor Object |
+| DefaultParam.cs:1:7:1:18 | call to method <object initializer> | DefaultParam.cs:1:7:1:18 | this access |
+| DefaultParam.cs:1:7:1:18 | this access | DefaultParam.cs:1:7:1:18 | this access |
+| DefaultParam.cs:1:7:1:18 | {...} | DefaultParam.cs:1:7:1:18 | {...} |
+| DefaultParam.cs:4:5:6:5 | {...} | DefaultParam.cs:4:5:6:5 | {...} |
+| DefaultParam.cs:5:9:5:25 | return ...; | DefaultParam.cs:5:16:5:16 | access to parameter b |
+| DefaultParam.cs:5:16:5:16 | (...) ... | DefaultParam.cs:5:16:5:16 | access to parameter b |
+| DefaultParam.cs:5:16:5:16 | access to parameter b | DefaultParam.cs:5:16:5:16 | access to parameter b |
+| DefaultParam.cs:5:16:5:20 | ... + ... | DefaultParam.cs:5:16:5:16 | access to parameter b |
+| DefaultParam.cs:5:16:5:24 | ... + ... | DefaultParam.cs:5:16:5:16 | access to parameter b |
+| DefaultParam.cs:5:20:5:20 | access to parameter s | DefaultParam.cs:5:20:5:20 | access to parameter s |
+| DefaultParam.cs:5:24:5:24 | (...) ... | DefaultParam.cs:5:24:5:24 | access to parameter i |
+| DefaultParam.cs:5:24:5:24 | access to parameter i | DefaultParam.cs:5:24:5:24 | access to parameter i |
 | ExitMethods.cs:6:7:6:17 | call to constructor Object | ExitMethods.cs:6:7:6:17 | call to constructor Object |
 | ExitMethods.cs:6:7:6:17 | call to method <object initializer> | ExitMethods.cs:6:7:6:17 | this access |
 | ExitMethods.cs:6:7:6:17 | this access | ExitMethods.cs:6:7:6:17 | this access |
