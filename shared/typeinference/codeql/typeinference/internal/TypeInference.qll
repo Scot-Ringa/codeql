@@ -145,6 +145,12 @@ signature module InputSig1<LocationSig Location> {
     Location getLocation();
   }
 
+  /**
+   * Holds if `t` is a pseudo type. Pseudo types are skipped when checking for
+   * non-instantiations in `isNotInstantiationOf`.
+   */
+  predicate isPseudoType(Type t);
+
   /** A type parameter. */
   class TypeParameter extends Type;
 
@@ -566,15 +572,17 @@ module Make1<LocationSig Location, InputSig1<Location> Input1> {
         )
       }
 
+      pragma[nomagic]
       private predicate typeParametersEqual(
-        App app, TypeAbstraction abs, Constraint constraint, TypeParameter tp
+        App app, TypeAbstraction abs, Constraint constraint, int i
       ) {
-        satisfiesConcreteTypes(app, abs, constraint) and
-        tp = getNthTypeParameter(abs, _) and
-        (
+        exists(TypeParameter tp |
+          satisfiesConcreteTypes(app, abs, constraint) and
+          tp = getNthTypeParameter(abs, i)
+        |
           not exists(getNthTypeParameterPath(constraint, tp, _))
           or
-          exists(int n | n = max(int i | exists(getNthTypeParameterPath(constraint, tp, i))) |
+          exists(int n | n = max(int j | exists(getNthTypeParameterPath(constraint, tp, j))) |
             // If the largest index is 0, then there are no equalities to check as
             // the type parameter only occurs once.
             if n = 0 then any() else typeParametersEqualToIndex(app, abs, constraint, tp, _, n)
@@ -585,12 +593,10 @@ module Make1<LocationSig Location, InputSig1<Location> Input1> {
       private predicate typeParametersHaveEqualInstantiationToIndex(
         App app, TypeAbstraction abs, Constraint constraint, int i
       ) {
-        exists(TypeParameter tp | tp = getNthTypeParameter(abs, i) |
-          typeParametersEqual(app, abs, constraint, tp) and
-          if i = 0
-          then any()
-          else typeParametersHaveEqualInstantiationToIndex(app, abs, constraint, i - 1)
-        )
+        typeParametersEqual(app, abs, constraint, i) and
+        if i = 0
+        then any()
+        else typeParametersHaveEqualInstantiationToIndex(app, abs, constraint, i - 1)
       }
 
       /**
@@ -624,6 +630,26 @@ module Make1<LocationSig Location, InputSig1<Location> Input1> {
         )
       }
 
+      pragma[nomagic]
+      private predicate hasTypeParameterAt(
+        App app, TypeAbstraction abs, Constraint constraint, TypePath path, TypeParameter tp
+      ) {
+        tp = getTypeAt(app, abs, constraint, path) and
+        tp = abs.getATypeParameter()
+      }
+
+      private Type getNonPseudoTypeAt(App app, TypePath path) {
+        result = app.getTypeAt(path) and not isPseudoType(result)
+      }
+
+      pragma[nomagic]
+      private Type getNonPseudoTypeAtTypeParameter(
+        App app, TypeAbstraction abs, Constraint constraint, TypeParameter tp, TypePath path
+      ) {
+        hasTypeParameterAt(app, abs, constraint, path, tp) and
+        result = getNonPseudoTypeAt(app, path)
+      }
+
       /**
        * Holds if `app` is _not_ a possible instantiation of `constraint`, because `app`
        * and `constraint` differ on concrete types at `path`.
@@ -643,12 +669,21 @@ module Make1<LocationSig Location, InputSig1<Location> Input1> {
       predicate isNotInstantiationOf(
         App app, TypeAbstraction abs, Constraint constraint, TypePath path
       ) {
-        // `app` and `constraint` differ on a concrete type
+        // `app` and `constraint` differ on a non-pseudo concrete type
         exists(Type t, Type t2 |
           t = getTypeAt(app, abs, constraint, path) and
           not t = abs.getATypeParameter() and
-          app.getTypeAt(path) = t2 and
+          t2 = getNonPseudoTypeAt(app, path) and
           t2 != t
+        )
+        or
+        // `app` has different instantiations of a type parameter mentioned at two
+        // different paths
+        exists(TypeParameter tp, TypePath path2, Type t, Type t2 |
+          t = getNonPseudoTypeAtTypeParameter(app, abs, constraint, tp, path) and
+          t2 = getNonPseudoTypeAtTypeParameter(app, abs, constraint, tp, path2) and
+          t != t2 and
+          path != path2
         )
       }
     }
