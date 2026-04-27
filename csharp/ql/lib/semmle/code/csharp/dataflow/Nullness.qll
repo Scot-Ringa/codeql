@@ -130,7 +130,7 @@ private predicate dereferenceAt(ControlFlowNode node, Ssa::Definition def, Deref
   d = def.getAReadAtNode(node)
 }
 
-private predicate isMaybeNullArgument(Ssa::ImplicitParameterDefinition def, MaybeNullExpr arg) {
+private predicate isMaybeNullArgument(Ssa::ParameterDefinition def, MaybeNullExpr arg) {
   exists(AssignableDefinitions::ImplicitParameterDefinition pdef, Parameter p |
     p = def.getParameter()
   |
@@ -181,7 +181,7 @@ private predicate hasMultipleParamsArguments(Call c) {
   )
 }
 
-private predicate isNullDefaultArgument(Ssa::ImplicitParameterDefinition def, AlwaysNullExpr arg) {
+private predicate isNullDefaultArgument(Ssa::ParameterDefinition def, AlwaysNullExpr arg) {
   exists(AssignableDefinitions::ImplicitParameterDefinition pdef, Parameter p |
     p = def.getParameter()
   |
@@ -337,8 +337,7 @@ class Dereference extends G::DereferenceableExpr {
         or
         p.fromSource() and
         exists(
-          Ssa::ImplicitParameterDefinition def,
-          AssignableDefinitions::ImplicitParameterDefinition pdef
+          Ssa::ParameterDefinition def, AssignableDefinitions::ImplicitParameterDefinition pdef
         |
           p = def.getParameter()
         |

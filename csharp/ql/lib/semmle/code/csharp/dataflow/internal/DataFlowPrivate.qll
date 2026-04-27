@@ -1303,7 +1303,7 @@ private module NearestLocationInputParamAfterCallable implements NearestLocation
 
 private module ParameterNodes {
   pragma[nomagic]
-  private predicate ssaParamDef(Ssa::ImplicitParameterDefinition ssaDef, Parameter p, Location l) {
+  private predicate ssaParamDef(Ssa::ParameterDefinition ssaDef, Parameter p, Location l) {
     p = ssaDef.getParameter() and
     l = ssaDef.getLocation()
   }
@@ -1358,7 +1358,7 @@ private module ParameterNodes {
     }
 
     /** Gets the SSA definition corresponding to this parameter, if any. */
-    Ssa::ImplicitParameterDefinition getSsaDefinition() {
+    Ssa::ParameterDefinition getSsaDefinition() {
       exists(Parameter p, Location l |
         l = this.getParameterLocation(p) and
         ssaParamDef(result, p, l)

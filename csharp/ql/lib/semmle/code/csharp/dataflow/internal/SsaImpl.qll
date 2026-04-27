@@ -7,6 +7,7 @@ private import codeql.ssa.Ssa as SsaImplCommon
 private import AssignableDefinitions
 private import semmle.code.csharp.controlflow.Guards as Guards
 private import semmle.code.csharp.dataflow.internal.BaseSSA
+private import semmle.code.csharp.internal.Location
 
 private module SsaInput implements SsaImplCommon::InputSig<Location, BasicBlock> {
   class SourceVariable = Ssa::SourceVariable;
@@ -126,7 +127,6 @@ private module SourceVariableImpl {
    */
   predicate variableDefinition(BasicBlock bb, int i, Ssa::SourceVariable v, AssignableDefinition ad) {
     ad = v.getADefinition() and
-    ad.getExpr().getControlFlowNode() = bb.getNode(i) and
     // In cases like `(x, x) = (0, 1)`, we discard the first (dead) definition of `x`
     not exists(TupleAssignmentDefinition first, TupleAssignmentDefinition second | first = ad |
       second.getAssignment() = first.getAssignment() and
@@ -136,7 +136,13 @@ private module SourceVariableImpl {
     // In cases like `M(out x, out x)`, there is no inherent evaluation order, so we
     // collapse the two definitions of `x`, using the first access as the representative,
     // and expose both definitions in `ExplicitDefinition.getADefinition()`
-    not ad = getASameOutRefDefAfter(v, _)
+    not ad = getASameOutRefDefAfter(v, _) and
+    (
+      ad.getExpr().getControlFlowNode() = bb.getNode(i)
+      or
+      ad.(AssignableDefinitions::ImplicitParameterDefinition).getParameter().getControlFlowNode() =
+        bb.getNode(i)
+    )
   }
 
   /**
@@ -242,6 +248,15 @@ private module SourceVariableImpl {
 
 private import SourceVariableImpl
 private import Ssa::SourceVariables
+
+pragma[nomagic]
+predicate localScopeSourceVariable(
+  Ssa::SourceVariables::LocalScopeSourceVariable sv, LocalScopeVariable v, Callable c1, Callable c2
+) {
+  sv.getAssignable() = v and
+  sv.getEnclosingCallable() = c1 and
+  v.getCallable() = c2
+}
 
 private module CallGraph {
   private import semmle.code.csharp.dispatch.Dispatch
@@ -767,9 +782,10 @@ private module Cached {
         v instanceof PlainFieldOrPropSourceVariable
       )
       or
-      // In case `c` has multiple bodies, we want each body to get its own implicit
-      // entry definition, so we use the basic block containing the body instead of
-      // the entry block.
+      // In case `c` has multiple bodies, we want each body to get its own set of
+      // parameter definitions, so we add special writes to the start of the basic
+      // blocks containing the bodies
+      strictcount(c.getBody()) > 1 and
       v.getAssignable() instanceof Parameter and
       bb.getANode().isBefore(c.getBody())
     )
@@ -962,7 +978,7 @@ private module DataFlowIntegrationInput implements Impl::DataFlowIntegrationInpu
   predicate ssaDefHasSource(WriteDefinition def) {
     // exclude flow directly from RHS to SSA definition, as we instead want to
     // go from RHS to matching assignable definition, and from there to SSA definition
-    def instanceof Ssa::ImplicitParameterDefinition
+    def instanceof Ssa::ParameterDefinition
   }
 
   /**
@@ -994,3 +1010,56 @@ private module DataFlowIntegrationInput implements Impl::DataFlowIntegrationInpu
 }
 
 private module DataFlowIntegrationImpl = Impl::DataFlowIntegration<DataFlowIntegrationInput>;
+
+private module MultiBodyNearestLocationInput implements NearestLocationInputSig {
+  class C = MultiBodyParameterDefinition;
+
+  predicate relevantLocations(MultiBodyParameterDefinition def, Location l1, Location l2) {
+    exists(Callable c, ControlFlowNode n |
+      l1 = def.getParameter().getALocation() and
+      n = def.getBasicBlock().getANode() and
+      n.isBefore(c.getBody()) and
+      l2 = n.getLocation()
+    )
+  }
+}
+
+pragma[nomagic]
+private predicate implicitEntryDef(
+  Ssa::ImplicitEntryDefinition def, Ssa::SourceVariable v, Callable c
+) {
+  v = def.getSourceVariable() and
+  c = def.getCallable()
+}
+
+/**
+ * An SSA definition representing the implicit initialization of a parameter
+ * at the beginning of a callable.
+ */
+abstract class ParameterDefinitionImpl extends Ssa::Definition {
+  /** Gets the parameter that this definition represents. */
+  abstract Parameter getParameter();
+
+  override string toString() {
+    result = "SSA param(" + pragma[only_bind_out](this.getParameter()) + ")"
+  }
+}
+
+class MultiBodyParameterDefinition extends ParameterDefinitionImpl, Ssa::ImplicitEntryDefinition {
+  private Parameter p;
+
+  MultiBodyParameterDefinition() {
+    exists(Ssa::SourceVariable sv, Callable c |
+      implicitEntryDef(this, sv, c) and
+      localScopeSourceVariable(sv, p, _, c)
+    )
+  }
+
+  override Parameter getParameter() { result = p }
+
+  override string toString() { result = ParameterDefinitionImpl.super.toString() }
+
+  override Location getLocation() {
+    NearestLocation<MultiBodyNearestLocationInput>::nearestLocation(this, result, _)
+  }
+}
