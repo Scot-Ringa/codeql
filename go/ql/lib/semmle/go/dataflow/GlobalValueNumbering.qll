@@ -138,6 +138,8 @@ private predicate iDomEffect(
  * dominator of `node` and no side-effects can occur between `result` and
  * `node`.
  *
+ * `entry` is the entry node for the function containing `node` and `result`.
+ *
  * `sideEffectCFG` has an edge from the function entry to every node with a
  * side-effect. This means that every node with a side-effect has the
  * function entry as its immediate dominator. So if node `x` dominates node
@@ -181,6 +183,10 @@ private predicate iDomEffect(
  *
  * The immediate dominator path to line 015 is 000 - 009 - 012 - 015.
  * Therefore, the most recent side effect for line 015 is line 009.
+ * (Note that line 009 is not a side-effect itself. Instead, it is the
+ * point where the control flow paths from the side-effects at 004 and 007
+ * merge. Because its immediate dominator is the entry node 000, it serves
+ * as the safe root for expressions evaluated after those side-effects.)
  */
 private ControlFlow::Node mostRecentSideEffect(ControlFlow::Node entry, ControlFlow::Node node) {
   iDomEffect(entry, entry, result) and
