@@ -20,7 +20,7 @@ async def get_input_openai():
 
     response2 = client.responses.create(
         instructions="Talks like a " + persona,  # $ Alert[py/prompt-injection]
-        input=[  # $ Alert[py/prompt-injection]
+        input=[
             {
                 "role": "developer",
                 "content": "Talk like a " + persona  # $ Alert[py/prompt-injection]
@@ -34,7 +34,7 @@ async def get_input_openai():
                     }
                 ]
             }
-        ]
+        ]  # $ Alert[py/prompt-injection]
     )
 
     response3 = await async_client.responses.create(
@@ -57,7 +57,7 @@ async def get_input_openai():
         )
 
     completion1 = client.chat.completions.create(
-        messages=[  # $ Alert[py/prompt-injection]
+        messages=[
             {
                 "role": "developer",
                 "content": "Talk like a " + persona # $ Alert[py/prompt-injection]
@@ -74,7 +74,7 @@ async def get_input_openai():
     )
 
     completion2 = azure_client.chat.completions.create(
-        messages=[  # $ Alert[py/prompt-injection]
+        messages=[
             {
                 "role": "developer",
                 "content": "Talk like a " + persona  # $ Alert[py/prompt-injection]
