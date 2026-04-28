@@ -918,8 +918,6 @@ private Gvn::GvnType getANonTypeParameterSubTypeRestricted(RelevantGvnType t) {
 
 /** A callable with an implicit `this` parameter. */
 private class InstanceCallable extends Callable {
-  private Location l;
-
   InstanceCallable() {
     not this.(Modifiable).isStatic() and
     // local functions and delegate capture `this` and should therefore
@@ -927,8 +925,6 @@ private class InstanceCallable extends Callable {
     not this instanceof LocalFunction and
     not this instanceof AnonymousFunctionExpr
   }
-
-  Location getARelevantLocation() { result = l }
 }
 
 /**
@@ -1019,8 +1015,7 @@ private module Cached {
     } or
     TInstanceParameterNode(InstanceCallable c, Location l) {
       c = any(DataFlowCallable dfc).asCallable(l) and
-      c instanceof CallableUsedInSource and
-      l = c.getARelevantLocation()
+      c instanceof CallableUsedInSource
     } or
     TDelegateSelfReferenceNode(Callable c) { lambdaCreationExpr(_, c) } or
     TLocalFunctionCreationNode(ControlFlowNodes::ElementNode cfn, Boolean isPostUpdate) {
