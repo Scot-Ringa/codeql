@@ -22,6 +22,11 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   res.send(q);
   res.status(200).send(b);
 
+  // JSON response (direct and chained)
+  res.json(c);
+  res.status(200).json(u);
+  res.jsonp(host);
+
   // Redirect
   res.redirect(req.query.url as string);
 }

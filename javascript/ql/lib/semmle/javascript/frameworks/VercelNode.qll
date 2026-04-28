@@ -141,8 +141,8 @@ module VercelNode {
   }
 
   /**
-   * An argument to `res.send(...)` on a Vercel response, including chained
-   * calls such as `res.status(200).send(...)`.
+   * An argument to `res.send(...)`, `res.json(...)`, or `res.jsonp(...)` on a
+   * Vercel response, including chained calls such as `res.status(200).json(...)`.
    */
   private class ResponseSendArgument extends Http::ResponseSendArgument {
     RouteHandler rh;
@@ -150,7 +150,7 @@ module VercelNode {
     ResponseSendArgument() {
       exists(Http::Servers::ResponseSource src |
         (src instanceof ResponseSource or src instanceof ChainedResponseSource) and
-        this = src.ref().getAMethodCall("send").getArgument(0) and
+        this = src.ref().getAMethodCall(["send", "json", "jsonp"]).getArgument(0) and
         rh = src.getRouteHandler()
       )
     }
