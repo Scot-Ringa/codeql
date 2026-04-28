@@ -7,7 +7,6 @@
 
 private import python
 private import semmle.python.ApiGraphs
-private import semmle.python.dataflow.new.DataFlow
 
 /**
  * Provides models for agents SDK (instances of the `agents.Runner` class etc).
@@ -84,35 +83,6 @@ module OpenAI {
       else
         // content.text
         result = content.getASubscript().getSubscript("text")
-    )
-  }
-}
-
-/**
- * Provides attribute-name-based sink detection for `chat.completions.create` calls.
- * This does not rely on API graph type resolution and thus works even when
- * the receiver cannot be traced back to a known constructor (e.g. due to `or` expressions).
- */
-module ChatCompletionsCreate {
-  /**
-   * Gets a `DataFlow::Node` that is the `content` value inside a message dict
-   * passed to a `*.chat.completions.create(messages=[{..., "content": <HERE>}])` call,
-   * matched purely by attribute names in the call chain.
-   */
-  DataFlow::Node getAMessageContentSink() {
-    exists(
-      DataFlow::MethodCallNode createCall, DataFlow::AttrRead completionsAttr,
-      DataFlow::AttrRead chatAttr
-    |
-      // Match *.chat.completions.create(...)
-      createCall.getMethodName() = "create" and
-      completionsAttr = createCall.getObject().getALocalSource() and
-      completionsAttr.getAttributeName() = "completions" and
-      chatAttr = completionsAttr.getObject().getALocalSource() and
-      chatAttr.getAttributeName() = "chat"
-    |
-      // The messages keyword argument value (the list itself, or individual dict content values)
-      result = createCall.getArgByName("messages")
     )
   }
 }

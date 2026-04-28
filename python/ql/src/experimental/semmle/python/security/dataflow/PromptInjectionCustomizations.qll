@@ -8,7 +8,6 @@ import python
 private import semmle.python.dataflow.new.DataFlow
 private import semmle.python.Concepts
 private import experimental.semmle.python.Concepts
-private import semmle.python.Frameworks
 private import semmle.python.dataflow.new.RemoteFlowSources
 private import semmle.python.dataflow.new.BarrierGuards
 private import semmle.python.frameworks.data.ModelsAsData
@@ -56,8 +55,6 @@ module PromptInjection {
       this = OpenAI::getContentNode().asSink()
       or
       this = AgentSDK::getContentNode().asSink()
-      or
-      this = ChatCompletionsCreate::getAMessageContentSink()
     }
   }
 
