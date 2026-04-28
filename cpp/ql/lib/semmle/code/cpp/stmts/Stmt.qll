@@ -1412,9 +1412,9 @@ private int indexOfSwitchCaseRank(BlockStmt b, int rnk) {
  * switch (i)
  * {
  * case 5:
- *   ...
+ *     ...
  * default:
- *   ...
+ *     ...
  * }
  * ```
  */
@@ -1709,9 +1709,9 @@ class SwitchCase extends Stmt, @stmt_switch_case {
  * switch (i)
  * {
  * case 5:
- *   ...
+ *     ...
  * default:
- *   ...
+ *     ...
  * }
  * ```
  */
@@ -1733,9 +1733,9 @@ class DefaultCase extends SwitchCase {
  * switch (i)
  * {
  * case 5:
- *   ...
+ *     ...
  * default:
- *   ...
+ *     ...
  * }
  * ```
  */
@@ -1770,10 +1770,10 @@ class SwitchStmt extends ConditionalStmt, @stmt_switch {
    * For example, for
    * ```
    * switch(i) {
-   *     case 1:
-   *     case 2:
+   * case 1:
+   * case 2:
    *     break;
-   *     default:
+   * default:
    *     break;
    * }
    * ```
@@ -1792,20 +1792,20 @@ class SwitchStmt extends ConditionalStmt, @stmt_switch {
    * For example, for
    * ```
    * switch(i) {
-   *     case 1:
-   *     case 2:
+   * case 1:
+   * case 2:
    *     break;
-   *     default:
+   * default:
    *     break;
    * }
    * ```
    * the result is
    * ```
    * {
-   *     case 1:
-   *     case 2:
+   * case 1:
+   * case 2:
    *     break;
-   *     default:
+   * default:
    *     break;
    * }
    * ```
@@ -1818,10 +1818,10 @@ class SwitchStmt extends ConditionalStmt, @stmt_switch {
    * For example, for
    * ```
    * switch(i) {
-   *     case 1:
-   *     case 2:
+   * case 1:
+   * case 2:
    *     break;
-   *     default:
+   * default:
    *     break;
    * }
    * ```
@@ -1853,18 +1853,18 @@ class SwitchStmt extends ConditionalStmt, @stmt_switch {
    * For example, for
    * ```
    * switch(i) {
-   *     case 1:
-   *     case 2:
+   * case 1:
+   * case 2:
    *     break;
-   *     default:
+   * default:
    *     break;
    * }
    * ```
    * the result is `default:`, but there is no result for
    * ```
    * switch(i) {
-   *     case 1:
-   *     case 2:
+   * case 1:
+   * case 2:
    *     break;
    * }
    * ```
@@ -1877,18 +1877,18 @@ class SwitchStmt extends ConditionalStmt, @stmt_switch {
    * For example, this holds for
    * ```
    * switch(i) {
-   *     case 1:
-   *     case 2:
+   * case 1:
+   * case 2:
    *     break;
-   *     default:
+   * default:
    *     break;
    * }
    * ```
    * but not for
    * ```
    * switch(i) {
-   *     case 1:
-   *     case 2:
+   * case 1:
+   * case 2:
    *     break;
    * }
    * ```
