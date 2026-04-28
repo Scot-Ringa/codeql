@@ -19,8 +19,12 @@ private import Cfg1
 private import Cfg2
 import Public
 
-/** Provides an implementation of the AST signature for C#. */
-private module Ast implements AstSig<Location> {
+/**
+ * INTERNAL: Do not use.
+ *
+ * Provides an implementation of the AST signature for C#.
+ */
+module Ast implements AstSig<Location> {
   private import csharp as CS
 
   class AstNode = ControlFlowElementOrCallable;
@@ -73,16 +77,39 @@ private module Ast implements AstSig<Location> {
   private AstNode getParent(AstNode n) { n = getChild(result, _) }
 
   Callable getEnclosingCallable(AstNode node) {
-    result = node.(ControlFlowElement).getEnclosingCallable() or
-    result.(ObjectInitMethod).initializes(getParent*(node)) or
+    result = node.(ControlFlowElement).getEnclosingCallable()
+    or
+    result.(ObjectInitMethod).initializes(getParent*(node))
+    or
     Initializers::staticMemberInitializer(result, getParent*(node))
+    or
+    result = node.(Parameter).getCallable()
+    or
+    not skipControlFlow(node) and
+    getParent*(node) = any(Parameter p | result = p.getCallable()).getDefaultValue()
   }
 
-  class Callable = CS::Callable;
+  class Callable extends CS::Callable {
+    Callable() { this.isUnboundDeclaration() }
+  }
 
   AstNode callableGetBody(Callable c) {
     not skipControlFlow(result) and
     result = c.getBody()
+  }
+
+  final private class ParameterFinal = CS::Parameter;
+
+  class Parameter extends ParameterFinal {
+    Expr getDefaultValue() {
+      // Avoid combinatorial explosions for callables with multiple bodies
+      result = unique( | | super.getDefaultValue())
+    }
+  }
+
+  Parameter callableGetParameter(Callable c, int i) {
+    not skipControlFlow(result) and
+    result = c.getParameter(i)
   }
 
   class Stmt = CS::Stmt;
@@ -232,9 +259,11 @@ private class CompilationExt extends TCompilationExt {
 }
 
 /** Gets the compilation that source file `f` belongs to. */
-private CompilationExt getCompilation(File f) {
+bindingset[e]
+pragma[inline_late]
+private CompilationExt getCompilation(Element e) {
   exists(Compilation c |
-    f = c.getAFileCompiled() and
+    e.getALocation().getFile() = c.getAFileCompiled() and
     result = TCompilation(c)
   )
   or
@@ -415,12 +444,12 @@ private module Input implements InputSig1, InputSig2 {
     l = TLblGoto(n.(LabelStmt).getLabel())
   }
 
-  class CallableBodyPartContext = CompilationExt;
+  class CallableContext = CompilationExt;
 
   pragma[nomagic]
-  Ast::AstNode callableGetBodyPart(Callable c, CallableBodyPartContext ctx, int index) {
+  Ast::AstNode callableGetBodyPart(Ast::Callable c, CallableContext ctx, int index) {
     not Ast::skipControlFlow(result) and
-    ctx = getCompilation(result.getFile()) and
+    ctx = getCompilation(result) and
     (
       result = Initializers::initializedInstanceMemberOrder(c, index)
       or
@@ -437,7 +466,17 @@ private module Input implements InputSig1, InputSig2 {
         or
         i = 2 and result = ctor.getBody()
       )
+      or
+      not c instanceof Constructor and
+      result = c.getBody() and
+      index = 0
     )
+  }
+
+  pragma[nomagic]
+  Ast::Parameter callableGetParameter(Ast::Callable c, CallableContext ctx, int index) {
+    result = Ast::callableGetParameter(c, index) and
+    ctx = getCompilation(result)
   }
 
   private Expr getQualifier(QualifiableExpr qe) {

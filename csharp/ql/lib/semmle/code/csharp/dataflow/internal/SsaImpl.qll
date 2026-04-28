@@ -753,26 +753,25 @@ private module Cached {
 
   cached
   predicate implicitEntryDefinition(BasicBlock bb, Ssa::SourceVariable v) {
-    exists(EntryBasicBlock entry, Callable c |
-      c = entry.getEnclosingCallable() and
-      // In case `c` has multiple bodies, we want each body to get its own implicit
-      // entry definition. In case `c` doesn't have multiple bodies, the line below
-      // is simply the same as `bb = entry`, because `entry.getFirstNode().getASuccessor()`
-      // will be in the entry block.
-      bb = entry.getFirstNode().getASuccessor().getBasicBlock() and
-      c = v.getEnclosingCallable()
-    |
-      // Captured variable
-      exists(LocalScopeVariable lsv |
-        v = any(LocalScopeSourceVariable lv | lsv = lv.getAssignable())
-      |
-        lsv.getCallable() != c
+    exists(Callable c | c = v.getEnclosingCallable() |
+      c = bb.(EntryBasicBlock).getEnclosingCallable() and
+      (
+        // Captured variable
+        exists(LocalScopeVariable lsv |
+          v = any(LocalScopeSourceVariable lv | lsv = lv.getAssignable())
+        |
+          lsv.getCallable() != c
+        )
+        or
+        // Each tracked field and property has an implicit entry definition
+        v instanceof PlainFieldOrPropSourceVariable
       )
       or
-      // Each tracked field and property has an implicit entry definition
-      v instanceof PlainFieldOrPropSourceVariable
-      or
-      v.getAssignable() instanceof Parameter
+      // In case `c` has multiple bodies, we want each body to get its own implicit
+      // entry definition, so we use the basic block containing the body instead of
+      // the entry block.
+      v.getAssignable() instanceof Parameter and
+      bb.getANode().isBefore(c.getBody())
     )
   }
 

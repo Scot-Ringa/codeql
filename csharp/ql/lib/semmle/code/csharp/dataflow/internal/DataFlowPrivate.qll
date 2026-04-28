@@ -175,6 +175,18 @@ private module ThisFlow {
     result = strictcount(int primaryParamPos | primaryConstructorThisAccess(_, bb, primaryParamPos))
   }
 
+  private module BodyNearestLocationInput implements NearestLocationInputSig {
+    class C = ControlFlowElement;
+
+    predicate relevantLocations(ControlFlowElement body, Location l1, Location l2) {
+      exists(DataFlowCallable c |
+        any(InstanceParameterNode p).isParameterOf(c, _) and
+        body = c.asCallable(l1).getBody() and
+        l2 = body.getLocation()
+      )
+    }
+  }
+
   private predicate thisAccess(Node n, BasicBlock bb, int i) {
     thisAccess(n, bb.getNode(i))
     or
@@ -183,21 +195,29 @@ private module ThisFlow {
       i = ppos - numberOfPrimaryConstructorParameters(bb)
     )
     or
-    exists(DataFlowCallable c, EntryBasicBlock entry |
-      n.(InstanceParameterNode).isParameterOf(c, _) and
-      exists(ControlFlowNode succ |
-        succ = c.getAControlFlowNode() and
-        succ = entry.getFirstNode().getASuccessor() and
+    exists(Callable c, InstanceParameterNode p, Location l |
+      p = n and
+      c = p.getCallable(l) and
+      (
         // In case `c` has multiple bodies, we want each body to gets its own implicit
-        // entry definition. In case `c` doesn't have multiple bodies, the line below
-        // is simply the same as `bb = entry`, because `entry.getFirstNode().getASuccessor()`
-        // will be in the entry block.
-        bb = succ.getBasicBlock()
-      |
-        i = -1 - numberOfPrimaryConstructorParameters(bb)
+        // entry definition.
+        exists(ControlFlowElement body |
+          body = c.getBody() and
+          bb.getANode().isBefore(body) and
+          NearestLocation<BodyNearestLocationInput>::nearestLocation(body, l, _)
+        )
         or
-        not exists(numberOfPrimaryConstructorParameters(bb)) and i = -1
+        not c.hasBody() and
+        exists(EntryBasicBlock entry, ControlFlowNode succ |
+          succ = p.getEnclosingCallableImpl().getAControlFlowNode() and
+          succ = entry.getFirstNode().getASuccessor() and
+          bb = succ.getBasicBlock()
+        )
       )
+    |
+      i = -1 - numberOfPrimaryConstructorParameters(bb)
+      or
+      not exists(numberOfPrimaryConstructorParameters(bb)) and i = -1
     )
   }
 

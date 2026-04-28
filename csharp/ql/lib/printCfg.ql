@@ -22,6 +22,8 @@ external int selectedSourceColumn();
 private predicate selectedSourceColumnAlias = selectedSourceColumn/0;
 
 module ViewCfgQueryInput implements ControlFlow::ViewCfgQueryInputSig<File> {
+  private import semmle.code.csharp.controlflow.ControlFlowGraph
+
   predicate selectedSourceFile = selectedSourceFileAlias/0;
 
   predicate selectedSourceLine = selectedSourceLineAlias/0;
@@ -29,7 +31,7 @@ module ViewCfgQueryInput implements ControlFlow::ViewCfgQueryInputSig<File> {
   predicate selectedSourceColumn = selectedSourceColumnAlias/0;
 
   predicate cfgScopeSpan(
-    Callable scope, File file, int startLine, int startColumn, int endLine, int endColumn
+    Ast::Callable scope, File file, int startLine, int startColumn, int endLine, int endColumn
   ) {
     file = scope.getFile() and
     scope.getLocation().getStartLine() = startLine and
