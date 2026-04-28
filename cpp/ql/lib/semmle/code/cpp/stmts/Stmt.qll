@@ -1828,6 +1828,26 @@ class SwitchStmt extends ConditionalStmt, @stmt_switch {
   SwitchCase getASwitchCase() { switch_case(underlyingElement(this), _, unresolveElement(result)) }
 
   /**
+   * Gets the `n`th 'switch case' statement of this 'switch' statement, where
+   * `n` is 0-based.
+   *
+   * For example, for
+   * ```
+   * switch(i) {
+   *     case 1:
+   *     case 2:
+   *     break;
+   *     default:
+   *     break;
+   * }
+   * ```
+   * 0 yields `case 5:`, 1 yields `case 6:`, and 2 yields `default:`.
+   */
+  SwitchCase getSwitchCase(int n) {
+    switch_case(underlyingElement(this), n, unresolveElement(result))
+  }
+
+  /**
    * Gets the 'default case' statement of this 'switch' statement,
    * if any.
    *
