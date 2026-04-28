@@ -8,6 +8,7 @@
  */
 
 import csharp
+import semmle.code.csharp.controlflow.internal.ControlFlowGraph
 
 external string selectedSourceFile();
 
