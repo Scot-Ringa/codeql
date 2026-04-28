@@ -1836,13 +1836,10 @@ class SwitchStmt extends ConditionalStmt, @stmt_switch {
    * For example, for
    * ```
    * switch(i) {
-   *     case 1:
-   *     case 2:
-   *     break;
-   *     default:
-   *     break;
-   * }
-   * ```
+   * case 5:
+   * case 6:
+   * default:
+   * }   * ```
    * 0 yields `case 5:`, 1 yields `case 6:`, and 2 yields `default:`.
    */
   SwitchCase getSwitchCase(int n) {
