@@ -1516,8 +1516,10 @@ class SwitchCase extends Stmt, @stmt_switch_case {
    * which has result `default:`, which has no result.
    */
   SwitchCase getNextSwitchCase() {
-    result.getSwitchStmt() = this.getSwitchStmt() and
-    result.getChildNum() = this.getChildNum() + 1
+    exists(SwitchStmt s, int n |
+      this = s.getSwitchCase(n) and
+      result = s.getSwitchCase(n + 1)
+    )
   }
 
   /**
