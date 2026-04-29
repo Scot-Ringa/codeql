@@ -1395,15 +1395,11 @@ module Make0<LocationSig Location, AstSig<Location> Ast> {
           n2.isBefore(getParameterOrBodyEntry(c, _, 1))
           or
           exists(CallableContextOption ctx, Parameter p, int i | p = getRankedParameter(c, ctx, i) |
-            exists(ConditionalSuccessor t |
+            exists(MatchingSuccessor t |
               n1.isAfterValue(p, t) and
-              t.getKind().isMatching()
-            |
-              t.getValue() = true and
-              n2.isBefore(getParameterOrBodyEntry(c, ctx, i + 1))
-              or
-              t.getValue() = false and
-              n2.isBefore(p.getDefaultValue())
+              if t.isMatch()
+              then n2.isBefore(getParameterOrBodyEntry(c, ctx, i + 1))
+              else n2.isBefore(p.getDefaultValue())
             )
             or
             n1.isAfter(p.getDefaultValue()) and
